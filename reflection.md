@@ -36,13 +36,24 @@ The main objects needed for the system, with the information they hold (attribut
 
 **a. Initial design**
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+My initial UML design used five classes, split between data holders and logic:
+
+- **`Owner`** — holds the person's name, care preferences, and daily time budget. Responsible for owning pets and supplying the constraints the scheduler works within.
+- **`Pet`** — holds identifying info (name, species, breed, age) and care notes. A passive data object describing who is being cared for.
+- **`Task`** — holds a single care activity's name, category, duration, priority, and recurrence. Represents the unit of work to be scheduled.
+- **`Scheduler`** — the logic engine. Responsible for sorting, filtering, and resolving conflicts among tasks, then generating and explaining a daily plan.
+- **`Plan`** — holds the generated schedule (ordered items, skipped tasks, reasoning). Responsible for presenting the result to the user.
+
+The key design choice was keeping `Owner`/`Pet`/`Task` as pure data holders and concentrating all behavior in `Scheduler`, with `Plan` as its output, so the logic lives in one place.
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+After asking my AI assistant to review `pawpal_system.py`, I made two changes based on its feedback about missing relationships:
+
+1. **Added `pets: list[Pet]` to `Owner`.** The UML showed "Owner owns many Pets," but the skeleton had no field linking them. Without it the owner couldn't actually hold their pets, so the relationship existed only on paper.
+2. **Added `pet_name: str` to `Task`.** Tasks had no way to indicate which pet they belonged to, so a multi-pet household couldn't tell whose walk or feeding a task was. Adding a reference restores that link.
+
+The assistant also flagged a potential bottleneck: `priority` is stored as free text (`"high"/"medium"/"low"`), which forces the scheduler to re-map strings to a sortable rank on every sort. I left this as-is for the skeleton phase but noted it — if it becomes a problem during implementation, I'll switch to an `Enum` or numeric rank.
 
 ---
 
