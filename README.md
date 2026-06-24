@@ -61,20 +61,31 @@ Today's Schedule for Alex
 
 ## 🧪 Testing PawPal+
 
+Run the full test suite from the project root:
+
 ```bash
-# Run the full test suite:
-pytest
-
-# Run with coverage:
-pytest --cov
+python -m pytest
 ```
 
-Sample test output:
+**What the tests cover** (`tests/test_pawpal.py`):
+
+- **Basics** — `mark_complete()` flips a task's status; adding a task increases a pet's task count.
+- **Sorting correctness** — tasks added out of order come back in chronological order.
+- **Recurrence logic** — completing a daily task queues a fresh, uncompleted task due the following day; a one-off task spawns no follow-up.
+- **Conflict detection** — two tasks at the same time produce exactly one warning; distinct times produce none.
+- **Edge cases** — a pet with no tasks sorts/conflict-checks cleanly; filtering by pet name excludes other pets' tasks.
+
+Successful test run:
 
 ```
-..                                                                       [100%]
-2 passed in 0.01s
+collected 9 items
+
+tests/test_pawpal.py .........                                           [100%]
+
+============================== 9 passed in 0.02s ===============================
 ```
+
+**Confidence level: ★★★★☆ (4/5)** — All core behaviors (sorting, recurrence, conflict detection) and key edge cases pass. Held at 4 because conflict detection only checks exact start times (not overlapping durations), and recurrence hasn't been tested across month/year boundaries.
 
 ## 📐 Smarter Scheduling
 
