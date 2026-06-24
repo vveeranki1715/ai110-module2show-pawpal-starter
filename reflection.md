@@ -66,8 +66,9 @@ The assistant also flagged a potential bottleneck: `priority` is stored as free 
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+My conflict detection (`Scheduler.detect_conflicts()`) only flags tasks that share the **exact same start time** (e.g., two tasks both at "08:00"). It does **not** account for overlapping durations — a 30-minute walk starting at 08:00 and a feeding at 08:15 won't be reported as a conflict, even though they physically overlap.
+
+This tradeoff is reasonable for the scenario: a pet owner's plan is a lightweight daily checklist, not a minute-accurate calendar. Exact-time matching catches the most common and most obvious double-bookings while keeping the logic simple, fast, and easy to reason about. It returns warning strings rather than raising, so the app keeps running. If the app later needed true calendar behavior, I'd extend it to compare `time + duration` ranges for overlap — but that adds parsing and interval-math complexity that isn't justified yet.
 
 ---
 

@@ -52,9 +52,11 @@ Output from running `python main.py`:
 Today's Schedule for Alex
 ================================
   08:00  [    ] Morning walk (30 min)  -> Biscuit [high]
-  08:30  [    ] Litter cleanup (10 min)  -> Mittens [medium]
-  09:00  [    ] Feeding (10 min)  -> Biscuit [high]
-  18:00  [    ] Play / enrichment (15 min)  -> Mittens [low]
+  08:00  [    ] Litter cleanup (10 min)  -> Mittens [low]
+  09:00  [    ] Feeding (10 min)  -> Mittens [medium]
+  18:00  [    ] Evening walk (30 min)  -> Biscuit [high]
+
+⚠️  Conflict at 08:00: Morning walk (Biscuit), Litter cleanup (Mittens)
 ```
 
 ## 🧪 Testing PawPal+
@@ -76,14 +78,12 @@ Sample test output:
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
-
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | `Scheduler.sort_by_time()` | Sorts (pet, task) pairs by the "HH:MM" time string; priority (high first) breaks ties; untimed tasks sort last. |
+| Filtering | `Scheduler.filter_by_pet(name)`, `Scheduler.filter_by_status(completed)` | Filter tasks down to a single pet, or to completed vs. incomplete. |
+| Conflict detection | `Scheduler.detect_conflicts()` | Lightweight check — warns (doesn't crash) when two uncompleted tasks share the exact same start time. |
+| Recurring tasks | `Task.next_occurrence()`, `Scheduler.complete_task(pet, task)` | Completing a daily/weekly task uses `timedelta` to queue a fresh instance on the next date (today + 1 day / + 1 week). |
 
 ## 📸 Demo Walkthrough
 
