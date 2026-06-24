@@ -2,6 +2,38 @@
 
 ## 1. System Design
 
+**Core user actions**
+
+Three core actions a user should be able to perform in PawPal+:
+
+1. **Add a pet and owner profile** — The user enters basic owner info and their pet's details (name, type/breed) so the assistant knows who it is planning care for.
+2. **Add and manage care tasks** — The user adds, edits, or removes pet care tasks (walks, feeding, meds, grooming, enrichment), each with at least a duration and a priority level.
+3. **Generate and view a daily plan** — The user requests a daily schedule, and the app produces a clear, ordered plan based on the available time, task priorities, and preferences — ideally explaining why it chose that arrangement.
+
+**Building blocks (objects)**
+
+The main objects needed for the system, with the information they hold (attributes) and actions they perform (methods):
+
+**`Owner`** — the person responsible for the pet.
+- *Attributes:* `name`, `preferences` (e.g., preferred walk times, quiet hours), `available_minutes` (time budget for the day).
+- *Methods:* `set_preferences()`, `set_time_budget(minutes)`.
+
+**`Pet`** — the animal being cared for.
+- *Attributes:* `name`, `species`, `breed`, `age`, `notes` (e.g., dietary or medical needs).
+- *Methods:* `update_info()`, `describe()`.
+
+**`Task`** — a single care activity.
+- *Attributes:* `name`, `category` (walk/feeding/meds/grooming/enrichment), `duration` (minutes), `priority` (high/medium/low), `recurrence` (daily/weekly), `preferred_time` (optional).
+- *Methods:* `mark_done()`, `edit(...)`, `is_recurring()`.
+
+**`Scheduler`** — the engine that turns tasks + constraints into a plan.
+- *Attributes:* `tasks` (list), `time_budget`, `preferences`.
+- *Methods:* `sort_tasks()` (by priority/duration), `filter_tasks()` (drop tasks that won't fit), `resolve_conflicts()` (overlapping slots), `generate_plan()`, `explain_plan()`.
+
+**`Plan`** — the generated daily schedule (output of the Scheduler).
+- *Attributes:* `date`, `scheduled_items` (ordered task + time-slot pairs), `skipped_tasks`, `total_time`, `reasoning`.
+- *Methods:* `add_item(task, time)`, `summary()`, `to_display()`.
+
 **a. Initial design**
 
 - Briefly describe your initial UML design.
