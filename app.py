@@ -97,6 +97,29 @@ st.subheader("Build Schedule")
 if st.button("Generate schedule"):
     if owner.get_all_tasks():
         scheduler = Scheduler(owner)
-        st.code(scheduler.format_schedule(), language="text")
+
+        # Surface conflicts first so the owner sees clashes before the plan.
+        conflicts = scheduler.detect_conflicts()
+        if conflicts:
+            for warning in conflicts:
+                st.warning(warning)
+        else:
+            st.success("No scheduling conflicts found. 🎉")
+
+        # Show the time-sorted plan as a clean, professional table.
+        st.markdown(f"#### Today's Schedule for {owner.name}")
+        st.table(
+            [
+                {
+                    "time": task.time or "—",
+                    "task": task.description,
+                    "pet": pet.name,
+                    "duration": task.duration,
+                    "priority": task.priority,
+                    "done": task.completed,
+                }
+                for pet, task in scheduler.sort_by_time()
+            ]
+        )
     else:
         st.warning("Add at least one task before generating a schedule.")

@@ -2,6 +2,15 @@
 
 You are building **PawPal+**, a Streamlit app that helps a pet owner plan care tasks for their pet.
 
+## ✨ Features
+
+- **Multi-pet management** — one owner can track multiple pets, each with its own list of care tasks.
+- **Sorting by time** — `Scheduler.sort_by_time()` orders all tasks chronologically by their "HH:MM" time, using priority (high first) to break ties.
+- **Filtering** — view tasks for a single pet (`filter_by_pet`) or by completion status (`filter_by_status`).
+- **Daily/weekly recurrence** — completing a recurring task auto-queues a fresh instance for the next date (today + 1 day or + 1 week) via `timedelta`.
+- **Conflict warnings** — `detect_conflicts()` flags any two uncompleted tasks scheduled at the same time, returning a warning instead of crashing.
+- **Interactive UI** — a Streamlit app to add pets, add tasks, and generate a sorted daily schedule with conflict alerts.
+
 ## Scenario
 
 A busy pet owner needs help staying consistent with pet care. They want an assistant that can:
@@ -98,12 +107,41 @@ tests/test_pawpal.py .........                                           [100%]
 
 ## 📸 Demo Walkthrough
 
-Describe your app in numbered steps so a reader can follow along without watching a video:
+Launch the interactive app with `streamlit run app.py`.
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+**Main UI features & actions:**
+- **Owner** — set the owner's name.
+- **Add a Pet** — submit a pet's name, species, and breed; the form calls `Owner.add_pet()`.
+- **Add a Task** — pick a pet, then enter a task title, time, duration, and priority; the form calls `Pet.add_task()`.
+- **Current Pets & Tasks** — each pet's tasks are listed in a table with their status.
+- **Generate Schedule** — builds a `Scheduler`, shows conflict warnings (`st.warning`) or a success banner, then renders the time-sorted plan as a table.
+
+**Example workflow:**
+1. Set the owner name to *Alex*.
+2. Add a pet — *Biscuit* (Dog, Golden Retriever).
+3. Add a second pet — *Mittens* (Cat, Tabby).
+4. Add tasks: Biscuit → "Morning walk" at 08:00 and "Evening walk" at 18:00; Mittens → "Litter cleanup" at 08:00 and "Feeding" at 09:00.
+5. Click **Generate schedule** → tasks appear sorted by time, and an 08:00 conflict warning is shown between Biscuit's walk and Mittens' litter cleanup.
+
+**Key Scheduler behaviors shown:** chronological **sorting** (out-of-order tasks reorder), **conflict warnings** (duplicate 08:00 slot flagged), per-pet **task lists**, and **recurrence** (completing a daily task queues tomorrow's instance — visible in the CLI demo).
+
+**Sample CLI output** (`python main.py`):
+
+```
+Today's Schedule for Alex
+================================
+  08:00  [    ] Morning walk (30 min)  -> Biscuit [high]
+  08:00  [    ] Litter cleanup (10 min)  -> Mittens [low]
+  09:00  [    ] Feeding (10 min)  -> Mittens [medium]
+  18:00  [    ] Evening walk (30 min)  -> Biscuit [high]
+
+⚠️  Conflict at 08:00: Morning walk (Biscuit), Litter cleanup (Mittens)
+
+Biscuit's tasks only:
+  18:00  Evening walk
+  08:00  Morning walk
+
+Completed 'Morning walk' -> next occurrence due 2026-06-24
+```
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->

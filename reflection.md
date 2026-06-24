@@ -76,13 +76,35 @@ This tradeoff is reasonable for the scenario: a pet owner's plan is a lightweigh
 
 **a. How you used AI**
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+I used my AI coding assistant across every phase but for different jobs:
+
+- **Design brainstorming** — generating the first Mermaid UML diagram from my brainstormed classes, attributes, and methods.
+- **Scaffolding** — turning the UML into dataclass skeletons with empty method stubs (agent/multi-file editing was most effective here).
+- **Algorithm help** — asking targeted questions like "how do I sort 'HH:MM' strings with a `sorted()` lambda key?" and "how do I use `timedelta` to compute the next occurrence date?"
+- **Testing** — drafting a test plan ("what edge cases matter for a scheduler with sorting and recurring tasks?") and then the test functions.
+- **Debugging/refactoring** — reviewing methods for readability and missing relationships.
+
+The most helpful prompts were **specific and scoped** ("sort these objects by this attribute") rather than open-ended ("write my scheduler"). Attaching the actual file so the assistant could see my real class names made its suggestions drop in cleanly.
+
+**Most effective features:** inline/agent multi-file editing for scaffolding, and chat for narrow algorithm questions and explaining unfamiliar code before I saved it.
 
 **b. Judgment and verification**
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
+**One suggestion I modified:** the assistant initially proposed storing `priority` as a free-text string and re-mapping it to a rank inside the sort. I kept the string for readability but added a small `PRIORITY_RANK` constant and a `Task.priority_rank()` helper, so the mapping lives in one place instead of being duplicated in every sort call. I also rejected an early suggestion to keep a separate `Plan` class — once `Scheduler` produced formatted output directly, the extra class added complexity without value, so I removed it from the final UML.
+
+**How I verified suggestions:** I ran `python main.py` to eyeball behavior (e.g., confirming out-of-order tasks actually reordered and the next-occurrence date was today + 1), and I relied on `python -m pytest` — when a behavior mattered, I wrote a test that asserted it rather than trusting the code by inspection.
+
+---
+
+## 3.5. AI Strategy
+
+**Which AI features were most effective:** Agent/multi-file editing was best for repetitive scaffolding (generating all four class skeletons at once). Scoped chat questions were best for the algorithmic pieces — `timedelta` recurrence and the `sorted()` lambda key — because I could ask, understand, and verify one idea at a time.
+
+**An AI suggestion I rejected/modified:** I declined the separate `Plan` class the assistant suggested in the initial design. After implementing `Scheduler.format_schedule()`, a `Plan` object would have just wrapped a list I was already producing, so I folded it in to keep the architecture clean — and updated `uml_final.mmd` to match.
+
+**How separate chat sessions helped:** Using a fresh session per phase (design, implementation, algorithms, testing) kept each conversation focused on one concern. The testing session wasn't polluted with implementation back-and-forth, so its edge-case suggestions were sharper, and I could attach only the files relevant to that phase.
+
+**What I learned as "lead architect":** The AI is fast at producing plausible code, but it doesn't own the design — I do. My job was to set the structure (UML, class responsibilities), ask precise questions, and **verify every suggestion against running code and tests** before accepting it. The best results came from treating the assistant as a knowledgeable pair-programmer whose output I always reviewed, not as an autopilot.
 
 ---
 
